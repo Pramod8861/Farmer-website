@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import {
   Text,
@@ -21,6 +21,29 @@ const dropDownOptions = [
 ];
 
 export default function DashboardPage({userProps}) {
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_TEST_VAR}/${userProps.uid}/dashboard`);
+
+        // Check for successful response
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const usersFilter = await response.json();
+        setUsers(usersFilter);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -40,7 +63,7 @@ export default function DashboardPage({userProps}) {
                 Dashboard
               </Text>
               <Text size="lg" as="p">
-                Wellcome to Lojusa Admin
+                Wellcome to {userProps.displayName} Admin
               </Text>
             </div>
             <div className="flex flex-row w-full gap-[30px]">
@@ -55,10 +78,10 @@ export default function DashboardPage({userProps}) {
                 </Button>
                 <div className="flex flex-col items-start justify-start w-2/5 mr-[23px] gap-[7px]">
                   <Heading size="md" as="h1">
-                    2560
+                    {users.length}
                   </Heading>
                   <Text size="md" as="p" className="!font-normal">
-                    Total Menus
+                    Total Items
                   </Text>
                 </div>
               </div>
